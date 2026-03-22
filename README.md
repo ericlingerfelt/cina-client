@@ -1,2 +1,2 @@
 # cina-client
-The Computational Infrastructure for Nuclear Astrophysics Java Client
+Computational Infrastructure for Nuclear Astrophysics Java Client
