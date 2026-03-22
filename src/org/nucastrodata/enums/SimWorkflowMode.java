@@ -1,0 +1,13 @@
+package org.nucastrodata.enums;
+
+public enum SimWorkflowMode {
+
+	SINGLE_STANDARD,
+	SINGLE_STANDARD_SENS,
+	SINGLE_CUSTOM, 
+	SINGLE_CUSTOM_SENS, 
+	DIR_STANDARD, 
+	DIR_CUSTOM_DOUBLE_LOOPING,
+	DIR_CUSTOM_SINGLE_LOOPING;
+
+}

@@ -1,0 +1,1605 @@
+package org.nucastrodata.element.elementviz.animator;
+
+import info.clearthought.layout.TableLayout;
+import info.clearthought.layout.TableLayoutConstants;
+
+import java.awt.*;
+import javax.swing.*;
+import java.util.*;
+import java.awt.event.*;
+import javax.swing.event.*;
+import org.nucastrodata.datastructure.feature.ElementVizDataStructure;
+import org.nucastrodata.element.elementviz.util.AbundRowData;
+import org.nucastrodata.element.elementviz.util.DerRowData;
+import org.nucastrodata.element.elementviz.util.ElementVizRainbowPanel;
+import org.nucastrodata.element.elementviz.util.FluxRowData;
+import org.nucastrodata.Cina;
+import org.nucastrodata.Dialogs;
+import org.nucastrodata.Fonts;
+import org.nucastrodata.HelpFrame;
+import org.nucastrodata.NumberFormats;
+import org.nucastrodata.SwingWorker;
+import org.nucastrodata.element.elementviz.animator.ElementVizAnimatorColorSettingsTable;
+
+/**
+ * The Class ElementVizAnimatorColorSettingsFrame.
+ */
+public class ElementVizAnimatorColorSettingsFrame extends JFrame implements ItemListener, ActionListener, ChangeListener, WindowListener{
+
+	/** The c. */
+	Container c;
+
+	/** The gbc. */
+	GridBagConstraints gbc;
+
+	/** The help button. */
+	JButton defaultButton, applyButton, helpButton;
+	
+	/** The der field. */
+	JTextField minField, maxField, derField;
+	
+	/** The der slider. */
+	JSlider minSlider, maxSlider, derSlider;
+	
+	/** The der label. */
+	JLabel topLabel, minLabel, maxLabel, colorSchemeLabelCont, colorSchemeLabelBinned, redLabel, greenLabel, blueLabel, schemeLabel, numBinLabel, derLabel;
+	
+	/** The color scheme combo box binned. */
+	JComboBox colorSchemeComboBoxCont, schemeComboBox, colorSchemeComboBoxBinned; 
+
+	/** The table pane. */
+	JScrollPane sp, tablePane;
+	
+	/** The num bin spinner. */
+	JSpinner numBinSpinner;
+	
+	/** The num bin model. */
+	SpinnerNumberModel numBinModel;
+
+	/** The element viz rainbow panel. */
+	ElementVizRainbowPanel elementVizRainbowPanel;
+	
+	/** The table. */
+	ElementVizAnimatorColorSettingsTable table;
+	
+	/** The element viz animator color settings help frame. */
+	public HelpFrame elementVizAnimatorColorSettingsHelpFrame;
+	
+	/** The num bin panel. */
+	JPanel valuePanel, colorPanel, buttonPanel, sliderPanel, schemePanel, contentPanelCont, contentPanelBin, numBinPanel;
+
+	/** The a b slider. */
+	JSlider x0RSlider, x0GSlider, x0BSlider, aRSlider, aGSlider, aBSlider;
+	
+	/** The a b label. */
+	JLabel x0RLabel, x0GLabel, x0BLabel, aRLabel, aGLabel, aBLabel;
+
+	/** The a b field. */
+	JTextField x0RField, x0GField, x0BField, aRField, aGField, aBField;
+
+	/** The delay dialog. */
+	JDialog delayDialog;
+
+	/** The exclude radio button. */
+	JRadioButton includeRadioButton, excludeRadioButton;
+
+	/** The button group. */
+	ButtonGroup buttonGroup;
+
+	/** The log10. */
+	double log10 = 0.434294482;
+
+	/** The x0 r. */
+	int x0R = 80;
+    
+    /** The x0 g. */
+    int x0G = 60;
+    
+    /** The x0 b. */
+    int x0B = 20;
+    
+    /** The a r. */
+    int aR = 50;
+    
+    /** The a g. */
+    int aG = 40;
+    
+    /** The a b. */
+    int aB = 30;
+	
+	/** The type. */
+	String type;
+	
+	/** The scheme. */
+	String scheme;
+	
+	/** The ds. */
+	private ElementVizDataStructure ds;
+	
+	/**
+	 * Instantiates a new element viz animator color settings frame.
+	 *
+	 * @param ds the ds
+	 */
+	public ElementVizAnimatorColorSettingsFrame(ElementVizDataStructure ds){
+
+		this.ds = ds;
+
+		setTitle("Animator Color Scale Settings");
+
+		c = getContentPane();
+	
+		c.setLayout(new BorderLayout());
+		
+		gbc = new GridBagConstraints();
+		
+		defaultButton = new JButton("Default Settings");
+		defaultButton.setFont(Fonts.buttonFont);
+		defaultButton.addActionListener(this);
+		
+		applyButton = new JButton("Apply Settings");
+		applyButton.setFont(Fonts.buttonFont);
+		applyButton.addActionListener(this);
+		
+		helpButton = new JButton("Help on This Interface");
+        helpButton.setFont(Fonts.buttonFont);
+        helpButton.addActionListener(this);
+		
+		x0RSlider = new JSlider(JSlider.VERTICAL, 0, 100, x0R);
+		x0RSlider.addChangeListener(this);
+		x0RSlider.setPreferredSize(new Dimension(20, 130));
+		
+		x0GSlider = new JSlider(JSlider.VERTICAL, 0, 100, x0G);
+		x0GSlider.addChangeListener(this);
+		x0GSlider.setPreferredSize(new Dimension(20, 130));
+		
+		x0BSlider = new JSlider(JSlider.VERTICAL, 0, 100, x0B);
+		x0BSlider.addChangeListener(this);
+		x0BSlider.setPreferredSize(new Dimension(20, 130));
+		
+		aRSlider = new JSlider(JSlider.VERTICAL, 0, 100, aR);
+		aRSlider.addChangeListener(this);
+		aRSlider.setPreferredSize(new Dimension(20, 130));
+		
+		aGSlider = new JSlider(JSlider.VERTICAL, 0, 100, aG);
+		aGSlider.addChangeListener(this);
+		aGSlider.setPreferredSize(new Dimension(20, 130));
+		
+		aBSlider = new JSlider(JSlider.VERTICAL, 0, 100, aB);
+		aBSlider.addChangeListener(this);
+		aBSlider.setPreferredSize(new Dimension(20, 130));
+		
+		redLabel = new JLabel("Red");
+
+		greenLabel = new JLabel("Green");
+		
+		blueLabel = new JLabel("Blue");
+
+		x0RLabel = new JLabel("Position: ");
+		x0RLabel.setFont(Fonts.textFont);
+		
+		x0GLabel = new JLabel("Position: ");
+		x0GLabel.setFont(Fonts.textFont);
+		
+		x0BLabel = new JLabel("Position: ");
+		x0BLabel.setFont(Fonts.textFont);
+		
+		aRLabel = new JLabel("Amount: ");
+		aRLabel.setFont(Fonts.textFont);
+		
+		aGLabel = new JLabel("Amount: ");
+		aGLabel.setFont(Fonts.textFont);
+		
+		aBLabel = new JLabel("Amount: ");
+		aBLabel.setFont(Fonts.textFont);
+
+		x0RField = new JTextField(5);
+		x0RField.setText(String.valueOf(x0R/100.0));
+		x0RField.setEditable(false);
+		
+		x0GField = new JTextField(5);
+		x0GField.setText(String.valueOf(x0G/100.0));
+		x0GField.setEditable(false);
+		
+		x0BField = new JTextField(5);
+		x0BField.setText(String.valueOf(x0B/100.0));
+		x0BField.setEditable(false);
+		
+		aRField = new JTextField(5);
+		aRField.setText(String.valueOf(aR/100.0));
+		aRField.setEditable(false);
+		
+		aGField = new JTextField(5);
+		aGField.setText(String.valueOf(aG/100.0));
+		aGField.setEditable(false);
+		
+		aBField = new JTextField(5);
+		aBField.setText(String.valueOf(aB/100.0));
+		aBField.setEditable(false);
+		
+		includeRadioButton = new JRadioButton("Map values outside of range to max/min color", true);
+		includeRadioButton.setFont(Fonts.textFont);
+
+		excludeRadioButton = new JRadioButton("Show only values within this range", false);
+		excludeRadioButton.setFont(Fonts.textFont);
+		
+		buttonGroup = new ButtonGroup();
+		buttonGroup.add(includeRadioButton);
+		buttonGroup.add(excludeRadioButton);
+		
+		minField = new JTextField(10);
+		minField.setEditable(false);
+		
+		maxField = new JTextField(10);
+		maxField.setEditable(false);
+		
+		derField = new JTextField(5);
+		derField.setEditable(false);
+		
+		minSlider = new JSlider(JSlider.HORIZONTAL);
+		minSlider.addChangeListener(this);
+		
+		maxSlider = new JSlider(JSlider.HORIZONTAL);
+		maxSlider.addChangeListener(this);
+		
+		derSlider = new JSlider(JSlider.HORIZONTAL, -30, -1, Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMag);
+		derSlider.addChangeListener(this);
+		
+		topLabel = new JLabel("<html>With this tool, you can set the floor and ceiling of the abundance color scale<p>and select a new color scheme for the Animator by using the sliders below.</html>");
+		
+		schemeLabel = new JLabel("Select type of color scale: ");
+		
+		numBinLabel = new JLabel("Select number of bins: ");
+		numBinLabel.setFont(Fonts.textFont);
+		
+		numBinModel = new SpinnerNumberModel(5, 1, 10, 1);
+
+		numBinSpinner = new JSpinner(numBinModel);
+		numBinSpinner.addChangeListener(this);
+        ((JSpinner.DefaultEditor)(numBinSpinner.getEditor())).getTextField().setEditable(false);
+		
+		minLabel = new JLabel("Abundance min: ");
+		minLabel.setFont(Fonts.textFont);
+		
+		maxLabel = new JLabel("Abundance max: ");
+		maxLabel.setFont(Fonts.textFont);
+		
+		derLabel = new JLabel("Derivative Threshold: ");
+		derLabel.setFont(Fonts.textFont);
+		
+		colorSchemeLabelCont = new JLabel("<html>Choose a<p>color scheme :</html>");
+		colorSchemeLabelCont.setFont(Fonts.textFont);
+		
+		colorSchemeComboBoxCont = new JComboBox();
+		colorSchemeComboBoxCont.addItemListener(this);
+		colorSchemeComboBoxCont.setFont(Fonts.textFont);
+		
+		colorSchemeLabelBinned = new JLabel("Choose a color scheme: ");
+		colorSchemeLabelBinned.setFont(Fonts.textFont);
+		
+		colorSchemeComboBoxBinned = new JComboBox();
+		colorSchemeComboBoxBinned.setFont(Fonts.textFont);
+		colorSchemeComboBoxBinned.addItem("Color Scheme 1");
+		colorSchemeComboBoxBinned.addItem("Color Scheme 2");
+		colorSchemeComboBoxBinned.addItem("Color Scheme 3");
+		
+		elementVizRainbowPanel = new ElementVizRainbowPanel(ds);
+		sp = new JScrollPane(elementVizRainbowPanel, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		sp.setPreferredSize(new Dimension(50, 100));
+		
+		schemeComboBox = new JComboBox();
+		schemeComboBox.setFont(Fonts.textFont);
+		schemeComboBox.addItem("Continuous");
+		schemeComboBox.addItem("Binned");
+		
+		table = new ElementVizAnimatorColorSettingsTable(ds);
+		table.validate();
+		
+		tablePane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		tablePane.setPreferredSize(new Dimension(600, 125));
+		
+		numBinPanel = new JPanel(new GridBagLayout());
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.insets = new Insets(5, 5, 5, 5);
+		numBinPanel.add(numBinLabel, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		numBinPanel.add(numBinSpinner, gbc);
+		
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		numBinPanel.add(colorSchemeLabelBinned, gbc);
+		
+		gbc.gridx = 3;
+		gbc.gridy = 0;
+		numBinPanel.add(colorSchemeComboBoxBinned, gbc);
+		
+		schemePanel = new JPanel(new GridBagLayout());
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		gbc.insets = new Insets(5, 5, 5, 5);
+		schemePanel.add(schemeLabel, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		schemePanel.add(schemeComboBox, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 2;
+		schemePanel.add(topLabel, gbc);
+		
+		gbc.gridwidth = 1;
+		
+		contentPanelCont = new JPanel();
+		double[] colCont = {10, TableLayoutConstants.PREFERRED
+							 ,10, TableLayoutConstants.PREFERRED
+							, 10, TableLayoutConstants.FILL, 10};
+		double[] rowCont = {10, TableLayoutConstants.PREFERRED, 10};
+		contentPanelCont.setLayout(new TableLayout(colCont, rowCont));
+		
+		contentPanelBin = new JPanel(new BorderLayout());
+		
+		colorPanel = new JPanel();
+		
+		double[] colColor = {TableLayoutConstants.FILL};
+		double[] rowColor = {TableLayoutConstants.PREFERRED
+							, 10, TableLayoutConstants.PREFERRED
+							, 10, TableLayoutConstants.FILL};
+		
+		colorPanel.setLayout(new TableLayout(colColor, rowColor));
+		colorPanel.add(colorSchemeLabelCont,    "0, 0, f, c");
+		colorPanel.add(colorSchemeComboBoxCont, "0, 2, f, c");
+		colorPanel.add(sp,                      "0, 4, c, f");
+		
+		buttonPanel = new JPanel();
+		buttonPanel.add(defaultButton);
+		buttonPanel.add(applyButton);
+		buttonPanel.add(helpButton);
+		
+		sliderPanel = new JPanel();
+		double[] colSlider = {TableLayoutConstants.FILL
+								, 10, TableLayoutConstants.FILL
+								, 10, TableLayoutConstants.FILL
+								, 10, TableLayoutConstants.FILL
+								, 10, TableLayoutConstants.FILL
+								, 10, TableLayoutConstants.FILL};
+		double[] rowSlider = {TableLayoutConstants.PREFERRED
+								, 10, TableLayoutConstants.PREFERRED
+								, 10, TableLayoutConstants.PREFERRED
+								, 10, TableLayoutConstants.FILL};
+		sliderPanel.setLayout(new TableLayout(colSlider, rowSlider));
+		
+		sliderPanel.add(redLabel,     "0, 0, 2, 0, c, c");
+		sliderPanel.add(greenLabel,   "4, 0, 6, 0, c, c");
+		sliderPanel.add(blueLabel,    "8, 0, 10, 0, c, c");
+		
+		sliderPanel.add(x0RLabel,     "0, 2, c, c");
+		sliderPanel.add(x0RField,     "0, 4, f, c");
+		sliderPanel.add(x0RSlider,    "0, 6, f, f");
+		
+		sliderPanel.add(aRLabel,      "2, 2, c, c");
+		sliderPanel.add(aRField,      "2, 4, f, c");
+		sliderPanel.add(aRSlider,     "2, 6, f, f");
+		
+		sliderPanel.add(x0GLabel,     "4, 2, c, c");
+		sliderPanel.add(x0GField,     "4, 4, f, c");
+		sliderPanel.add(x0GSlider,    "4, 6, f, f");
+		
+		sliderPanel.add(aGLabel,      "6, 2, c, c");
+		sliderPanel.add(aGField,      "6, 4, f, c");
+		sliderPanel.add(aGSlider,     "6, 6, f, f");
+		
+		sliderPanel.add(x0BLabel,     "8, 2, c, c");
+		sliderPanel.add(x0BField,     "8, 4, f, c");
+		sliderPanel.add(x0BSlider,    "8, 6, f, f");
+		
+		sliderPanel.add(aBLabel,      "10, 2, c, c");
+		sliderPanel.add(aBField,      "10, 4, f, c");
+		sliderPanel.add(aBSlider,     "10, 6, f, f");
+		
+		valuePanel = new JPanel(new GridBagLayout());
+			
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;	
+		gbc.insets = new Insets(5, 5, 5, 5);
+		valuePanel.add(maxLabel, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;	
+		valuePanel.add(maxField, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 2;	
+		valuePanel.add(maxSlider, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		gbc.gridwidth = 1;	
+		valuePanel.add(minLabel, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		gbc.gridwidth = 1;	
+		valuePanel.add(minField, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.gridwidth = 2;	
+		valuePanel.add(minSlider, gbc);
+	
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		gbc.gridwidth = 2;	
+		gbc.anchor = GridBagConstraints.WEST;
+		valuePanel.add(includeRadioButton, gbc);
+	
+		gbc.gridx = 0;
+		gbc.gridy = 5;
+		gbc.gridwidth = 2;	
+		valuePanel.add(excludeRadioButton, gbc);
+	
+		gbc.anchor = GridBagConstraints.CENTER;
+	
+		gbc.insets = new Insets(5, 5, 5, 5);
+	
+		c.add(buttonPanel, BorderLayout.SOUTH);
+		c.add(schemePanel, BorderLayout.NORTH);
+	
+	}
+	
+	/**
+	 * Close all frames.
+	 */
+	public void closeAllFrames(){
+		if(elementVizAnimatorColorSettingsHelpFrame!=null){
+			elementVizAnimatorColorSettingsHelpFrame.setVisible(false);
+			elementVizAnimatorColorSettingsHelpFrame.dispose();
+		}
+	} 
+	
+	/**
+	 * Sets the format layout.
+	 *
+	 * @param type the type
+	 * @param scheme the scheme
+	 */
+	public void setFormatLayout(String type, String scheme){
+	
+		if(scheme.equals("Continuous")){
+	
+			c.remove(contentPanelBin);
+	
+			if(type.equals("Abundance")){
+			
+				valuePanel.remove(derSlider);
+				valuePanel.remove(derLabel);
+				valuePanel.remove(derField);
+			
+				gbc.gridx = 0;
+				gbc.gridy = 2;
+				gbc.gridwidth = 1;
+				gbc.insets = new Insets(5, 5, 10, 5);
+				valuePanel.add(minLabel, gbc);
+				
+				gbc.gridx = 1;
+				gbc.gridy = 2;
+				gbc.gridwidth = 1;	
+				valuePanel.add(minField, gbc);
+				
+				gbc.gridx = 0;
+				gbc.gridy = 3;
+				gbc.gridwidth = 2;	
+				valuePanel.add(minSlider, gbc);
+				
+				minLabel.setText("Abundance min: ");
+				maxLabel.setText("Abundance max: ");
+				
+				topLabel.setText("<html>With this tool, you can set the floor and ceiling of the abundance color scale<p>and select a new color scheme for the Animator by using the sliders below.</html>");
+				
+				colorSchemeComboBoxCont.removeItemListener(this);
+				colorSchemeComboBoxCont.removeAllItems();
+				
+				colorSchemeComboBoxCont.addItem("Rainbow 1");
+				colorSchemeComboBoxCont.addItem("Rainbow 2");
+				colorSchemeComboBoxCont.addItem("Fire");
+				colorSchemeComboBoxCont.addItem("Purple Haze");
+				colorSchemeComboBoxCont.addItem("Greyscale");
+				
+				colorSchemeComboBoxCont.addItemListener(this);
+				
+			}else if(type.equals("Derivative")){
+			
+				valuePanel.remove(minSlider);
+				valuePanel.remove(minLabel);
+				valuePanel.remove(minField);
+				
+				gbc.gridx = 0;
+				gbc.gridy = 2;
+				gbc.gridwidth = 1;
+				gbc.insets = new Insets(5, 5, 10, 5);
+				valuePanel.add(derLabel, gbc);
+				
+				gbc.gridx = 1;
+				gbc.gridy = 2;
+				gbc.gridwidth = 1;	
+				valuePanel.add(derField, gbc);
+				
+				gbc.gridx = 0;
+				gbc.gridy = 3;
+				gbc.gridwidth = 2;	
+				valuePanel.add(derSlider, gbc);
+			
+				maxLabel.setText("Derivative max/min (\u00b1): ");
+				
+				topLabel.setText("<html>With this tool, you can set the floor, ceiling and threshold of the derivative color scale<p>and select a new color scheme for the Animator by using the sliders below.</html>");
+			
+				colorSchemeComboBoxCont.removeItemListener(this);
+				colorSchemeComboBoxCont.removeAllItems();
+			
+				colorSchemeComboBoxCont.addItem("Color Scheme 1");
+				colorSchemeComboBoxCont.addItem("Color Scheme 2");
+				colorSchemeComboBoxCont.addItem("Color Scheme 3");
+				
+				colorSchemeComboBoxCont.addItemListener(this);
+				
+			}else if(type.equals("Reaction Flux")){
+			
+				valuePanel.remove(derSlider);
+				valuePanel.remove(derLabel);
+				valuePanel.remove(derField);
+			
+				gbc.gridx = 0;
+				gbc.gridy = 2;
+				gbc.gridwidth = 1;
+				gbc.insets = new Insets(5, 5, 10, 5);
+				valuePanel.add(minLabel, gbc);
+				
+				gbc.gridx = 1;
+				gbc.gridy = 2;
+				gbc.gridwidth = 1;	
+				valuePanel.add(minField, gbc);
+				
+				gbc.gridx = 0;
+				gbc.gridy = 3;
+				gbc.gridwidth = 2;	
+				valuePanel.add(minSlider, gbc);
+			
+				minLabel.setText("Reaction Flux min: ");
+				maxLabel.setText("Reaction Flux max: ");
+				
+				topLabel.setText("<html>With this tool, you can set the floor and ceiling of the reaction flux color scale<p>and select a new color scheme for the Animator by using the sliders below.</html>");
+			
+				colorSchemeComboBoxCont.removeItemListener(this);
+				colorSchemeComboBoxCont.removeAllItems();
+			
+				colorSchemeComboBoxCont.addItem("Rainbow 1");
+				colorSchemeComboBoxCont.addItem("Rainbow 2");
+				colorSchemeComboBoxCont.addItem("Fire");
+				colorSchemeComboBoxCont.addItem("Purple Haze");
+				colorSchemeComboBoxCont.addItem("Greyscale");
+				
+				colorSchemeComboBoxCont.addItemListener(this);
+					
+			}
+		
+			contentPanelCont.add(valuePanel, "1, 1, c, c");
+			contentPanelCont.add(colorPanel, "3, 1, c, c");
+			contentPanelCont.add(sliderPanel, "5, 1, f, c");
+			
+			c.add(contentPanelCont, BorderLayout.CENTER);
+			
+			gbc.gridwidth = 1;
+		
+		}else if(scheme.equals("Binned")){
+			
+			c.remove(contentPanelCont);
+			
+			contentPanelBin.add(numBinPanel, BorderLayout.NORTH);
+			contentPanelBin.add(tablePane, BorderLayout.CENTER);
+			
+			c.add(contentPanelBin, BorderLayout.CENTER);
+
+			if(type.equals("Abundance")){
+		
+				topLabel.setText("<html>With this tool, you can select the number of bins, edit the interval min and max,<p>and choose the bin color.</html>");
+			
+			}else if(type.equals("Derivative")){
+			
+				topLabel.setText("<html>With this tool, you can select the number of bins, edit the interval min and max,<p>and choose the bin color for positive and negative values.</html>");
+
+			}else if(type.equals("Reaction Flux")){
+			
+				topLabel.setText("<html>With this tool, you can select the number of bins, edit the interval min and max,<p>choose the bin color, and choose the flux arrow line style and line widths.</html>");
+
+			}
+			
+			colorSchemeComboBoxBinned.addItemListener(this);
+		
+		}
+		
+		
+				
+		validate();
+
+	}
+	
+	/**
+	 * Sets the current state.
+	 *
+	 * @param type the type
+	 * @param scheme the scheme
+	 */
+	public void setCurrentState(String type, String scheme){
+	
+		this.type = type;
+		this.scheme = scheme;
+		
+		schemeComboBox.removeItemListener(this);
+		schemeComboBox.setSelectedItem(scheme);
+		schemeComboBox.addItemListener(this);
+		
+		if(scheme.equals("Continuous")){
+		
+			double min = 0.0;
+			double max = 0.0;
+			int derAbundMag = 0;
+		
+			minSlider.removeChangeListener(this);
+			maxSlider.removeChangeListener(this);
+		
+			if(type.equals("Abundance")){
+		
+				elementVizRainbowPanel.setType(type, scheme);
+				
+				elementVizRainbowPanel.x0R = ds.getAbundColorValues()[0];
+				elementVizRainbowPanel.x0G = ds.getAbundColorValues()[1];
+				elementVizRainbowPanel.x0B = ds.getAbundColorValues()[2];
+				elementVizRainbowPanel.aR = ds.getAbundColorValues()[3];
+				elementVizRainbowPanel.aG = ds.getAbundColorValues()[4];
+				elementVizRainbowPanel.aB = ds.getAbundColorValues()[5];
+				
+				min = Cina.elementVizFrame.elementVizAnimatorFrame.getAbundMin();
+				max = Cina.elementVizFrame.elementVizAnimatorFrame.getAbundMax();
+	
+				elementVizRainbowPanel.repaint();
+				
+				setFormatLayout(type, scheme);
+				
+				minField.setText(Cina.elementVizFrame.elementVizAnimatorFrame.minField.getText());
+				maxField.setText(Cina.elementVizFrame.elementVizAnimatorFrame.maxField.getText());
+				
+				minSlider.setMinimum(getIntegerValue(min, min, max));											
+				minSlider.setMaximum(getIntegerValue(max, min, max));
+														
+				minSlider.setValue(getIntegerValue(Double.valueOf(Cina.elementVizFrame.elementVizAnimatorFrame.minField.getText()).doubleValue()
+														, min, max));
+				
+				maxSlider.setMinimum(getIntegerValue(min, min, max));
+				maxSlider.setMaximum(getIntegerValue(max, min, max));
+				
+				maxSlider.setValue(getIntegerValue(Double.valueOf(Cina.elementVizFrame.elementVizAnimatorFrame.maxField.getText()).doubleValue()
+														, min, max));
+	
+				if(ds.getAbundIncludeValues()){
+			
+					includeRadioButton.setSelected(true);
+					excludeRadioButton.setSelected(false);
+				
+				}else{
+				
+					includeRadioButton.setSelected(true);
+					excludeRadioButton.setSelected(false);
+				
+				}
+	
+			}else if(type.equals("Derivative")){
+
+				elementVizRainbowPanel.setType(type, scheme);
+				
+				elementVizRainbowPanel.x0R = ds.getDerColorValues()[0];
+				elementVizRainbowPanel.x0G = ds.getDerColorValues()[1];
+				elementVizRainbowPanel.x0B = ds.getDerColorValues()[2];
+				elementVizRainbowPanel.aR = ds.getDerColorValues()[3];
+				elementVizRainbowPanel.aG = ds.getDerColorValues()[4];
+				elementVizRainbowPanel.aB = ds.getDerColorValues()[5];
+
+				max = Cina.elementVizFrame.elementVizAnimatorFrame.getDerAbundMax();
+				derAbundMag = Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMag;
+
+				elementVizRainbowPanel.derAbundMag = derAbundMag;
+				elementVizRainbowPanel.repaint();
+				
+				setFormatLayout(type, scheme);
+				
+				derField.setText(String.valueOf(derAbundMag));
+										
+				derSlider.setValue(derAbundMag);
+				
+				maxField.setText(Cina.elementVizFrame.elementVizAnimatorFrame.maxField.getText());
+				
+				maxSlider.setMinimum(getIntegerValue(Math.pow(10, -30), Math.pow(10, -30), max));
+				maxSlider.setMaximum(getIntegerValue(max, Math.pow(10, -30), max));
+				
+				maxSlider.setValue(getIntegerValue(Double.valueOf(Cina.elementVizFrame.elementVizAnimatorFrame.maxField.getText()).doubleValue(), Math.pow(10, -30), max));
+
+				if(ds.getDerIncludeValues()){
+			
+					includeRadioButton.setSelected(true);
+					excludeRadioButton.setSelected(false);
+				
+				}else{
+				
+					includeRadioButton.setSelected(true);
+					excludeRadioButton.setSelected(false);
+				
+				}
+
+			}else if(type.equals("Reaction Flux")){
+
+				elementVizRainbowPanel.setType(type, scheme);
+				
+				elementVizRainbowPanel.x0R = ds.getFluxColorValues()[0];
+				elementVizRainbowPanel.x0G = ds.getFluxColorValues()[1];
+				elementVizRainbowPanel.x0B = ds.getFluxColorValues()[2];
+				elementVizRainbowPanel.aR = ds.getFluxColorValues()[3];
+				elementVizRainbowPanel.aG = ds.getFluxColorValues()[4];
+				elementVizRainbowPanel.aB = ds.getFluxColorValues()[5];
+				
+				min = Cina.elementVizFrame.elementVizAnimatorFrame.getFluxMin();
+				max = Cina.elementVizFrame.elementVizAnimatorFrame.getFluxMax();
+				
+				elementVizRainbowPanel.repaint();
+				
+				setFormatLayout(type, scheme);
+				
+				minField.setText(Cina.elementVizFrame.elementVizAnimatorFrame.minField.getText());
+				maxField.setText(Cina.elementVizFrame.elementVizAnimatorFrame.maxField.getText());
+				
+				minSlider.setMinimum(getIntegerValue(min, min, max));											
+				minSlider.setMaximum(getIntegerValue(max, min, max));
+														
+				minSlider.setValue(getIntegerValue(Double.valueOf(Cina.elementVizFrame.elementVizAnimatorFrame.minField.getText()).doubleValue()
+														, min, max));
+				
+				maxSlider.setMinimum(getIntegerValue(min, min, max));
+				maxSlider.setMaximum(getIntegerValue(max, min, max));
+				
+				maxSlider.setValue(getIntegerValue(Double.valueOf(Cina.elementVizFrame.elementVizAnimatorFrame.maxField.getText()).doubleValue()
+														, min, max));
+				
+				if(ds.getFluxIncludeValues()){
+			
+					includeRadioButton.setSelected(true);
+					excludeRadioButton.setSelected(false);
+				
+				}else{
+				
+					includeRadioButton.setSelected(true);
+					excludeRadioButton.setSelected(false);
+				
+				}
+				
+			}
+
+			minSlider.addChangeListener(this);
+			maxSlider.addChangeListener(this);
+
+			setSize(862, 400);
+		
+		}else if(scheme.equals("Binned")){
+		
+			setFormatLayout(type, scheme);
+		
+			int numBin = 0;
+			
+			if(type.equals("Abundance")){
+				
+				numBin = ds.getAbundBinData().size();
+				
+			}else if(type.equals("Derivative")){
+				
+				numBin = ds.getDerBinData().size();
+				
+			}else if(type.equals("Reaction Flux")){
+				
+				numBin = ds.getFluxBinData().size();
+				
+			}
+			
+			numBinModel.setValue(new Integer(numBin));
+			table.setCurrentState(type, numBin);
+			
+			setSize(getPreferredSize());
+		
+		}
+		
+		
+				
+		validate();
+
+	}
+	
+	/**
+	 * Gets the integer value.
+	 *
+	 * @param value the value
+	 * @param min the min
+	 * @param max the max
+	 * @return the integer value
+	 */
+	public int getIntegerValue(double value, double min, double max){
+	
+		int intValue = 0;
+		
+		double normValue = 0.0;
+		
+		double C = 1.0/(log10*Math.log(max/min));
+
+		if(value!=0.0){
+        	
+            normValue = C*log10*Math.log(value) - C*log10*Math.log(min);
+            
+        }
+		
+		intValue = (int)Math.round(normValue*1000);
+		
+		return intValue;
+	
+	}
+	
+	/**
+	 * Gets the double value.
+	 *
+	 * @param sliderValue the slider value
+	 * @param min the min
+	 * @param max the max
+	 * @return the double value
+	 */
+	public double getDoubleValue(int sliderValue, double min, double max){
+	
+		double value = 0.0;
+		
+		double normValue = ((double)sliderValue)/1000.0;
+		
+		double constant = log10*Math.log(max/min);
+		
+		double exponent = constant*normValue + log10*Math.log(min);
+		
+		value = Math.pow(10, exponent);
+		
+		return value;
+	
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+	 */
+	public void itemStateChanged(ItemEvent ie){
+
+		if(ie.getSource()==colorSchemeComboBoxCont){
+		
+			if(((String)colorSchemeComboBoxCont.getSelectedItem()).equals("Greyscale")){
+			
+				x0RSlider.setValue(100);
+				x0GSlider.setValue(100);
+				x0BSlider.setValue(100);
+				aRSlider.setValue(100);
+				aGSlider.setValue(100);
+				aBSlider.setValue(100);
+			
+			}else if(((String)colorSchemeComboBoxCont.getSelectedItem()).equals("Rainbow 1")){
+			
+				x0RSlider.setValue(80);
+				x0GSlider.setValue(60);
+				x0BSlider.setValue(20);
+				aRSlider.setValue(50);
+				aGSlider.setValue(40);
+				aBSlider.setValue(30);
+			
+			}else if(((String)colorSchemeComboBoxCont.getSelectedItem()).equals("Rainbow 2")){
+				
+				x0RSlider.setValue(44);
+				x0GSlider.setValue(2);
+				x0BSlider.setValue(100);
+				aRSlider.setValue(25);
+				aGSlider.setValue(32);
+				aBSlider.setValue(37);
+				
+			}else if(((String)colorSchemeComboBoxCont.getSelectedItem()).equals("Purple Haze")){
+			
+				x0RSlider.setValue(100);
+				x0GSlider.setValue(0);
+				x0BSlider.setValue(100);
+				aRSlider.setValue(84);
+				aGSlider.setValue(0);
+				aBSlider.setValue(84);
+			
+			}else if(((String)colorSchemeComboBoxCont.getSelectedItem()).equals("Fire")){
+			
+				x0RSlider.setValue(100);
+				x0GSlider.setValue(97);
+				x0BSlider.setValue(0);
+				aRSlider.setValue(71);
+				aGSlider.setValue(33);
+				aBSlider.setValue(0);
+			
+			}else if(((String)colorSchemeComboBoxCont.getSelectedItem()).equals("Color Scheme 1")){
+			
+				x0RSlider.setValue(100);
+				x0GSlider.setValue(0);
+				x0BSlider.setValue(0);
+				aRSlider.setValue(50);
+				aGSlider.setValue(0);
+				aBSlider.setValue(50);
+			
+			}else if(((String)colorSchemeComboBoxCont.getSelectedItem()).equals("Color Scheme 2")){
+			
+				x0RSlider.setValue(0);
+				x0GSlider.setValue(100);
+				x0BSlider.setValue(0);
+				aRSlider.setValue(00);
+				aGSlider.setValue(50);
+				aBSlider.setValue(50);
+			
+			}else if(((String)colorSchemeComboBoxCont.getSelectedItem()).equals("Color Scheme 3")){
+			
+				x0RSlider.setValue(0);
+				x0GSlider.setValue(100);
+				x0BSlider.setValue(0);
+				aRSlider.setValue(50);
+				aGSlider.setValue(50);
+				aBSlider.setValue(0);
+			
+			}
+		
+		}else if(ie.getSource()==colorSchemeComboBoxBinned){
+		
+			if(type.equals("Reaction Flux") || type.equals("Abundance")){
+		
+				if(colorSchemeComboBoxBinned.getSelectedItem().toString().equals("Color Scheme 1")){
+				
+					for(int i=0; i<numBinModel.getNumber().intValue(); i++){
+					
+						table.getModel().setValueAt(new Color(255-(i*40),0,0), i, 3);
+					
+					}
+				
+				}else if(colorSchemeComboBoxBinned.getSelectedItem().toString().equals("Color Scheme 2")){
+				
+					for(int i=0; i<numBinModel.getNumber().intValue(); i++){
+					
+						table.getModel().setValueAt(new Color(0,255-(i*40),0), i, 3);
+					
+					}
+				
+				}else if(colorSchemeComboBoxBinned.getSelectedItem().toString().equals("Color Scheme 3")){
+				
+					for(int i=0; i<numBinModel.getNumber().intValue(); i++){
+					
+						table.getModel().setValueAt(new Color(0, 0, 255-(i*40)), i, 3);
+					
+					}
+				
+				}
+			
+			}else if(type.equals("Derivative")){
+			
+				if(colorSchemeComboBoxBinned.getSelectedItem().toString().equals("Color Scheme 1")){
+				
+					for(int i=0; i<numBinModel.getNumber().intValue(); i++){
+					
+						table.getModel().setValueAt(new Color(255-(i*40),0,0), i, 3);
+						table.getModel().setValueAt(new Color(0, 255-(i*40),0), i, 4);
+					
+					}
+				
+				}else if(colorSchemeComboBoxBinned.getSelectedItem().toString().equals("Color Scheme 2")){
+				
+					for(int i=0; i<numBinModel.getNumber().intValue(); i++){
+					
+						table.getModel().setValueAt(new Color(0, 255-(i*40),0), i, 3);
+						table.getModel().setValueAt(new Color(255-(i*40),0,0), i, 4);
+					
+					}
+				
+				}else if(colorSchemeComboBoxBinned.getSelectedItem().toString().equals("Color Scheme 3")){
+				
+					for(int i=0; i<numBinModel.getNumber().intValue(); i++){
+					
+						table.getModel().setValueAt(new Color(0, 0, 255-(i*40)), i, 3);
+						table.getModel().setValueAt(new Color(255-(i*40),0,0), i, 4);
+					
+					}
+				
+				}
+			
+			}
+			
+			table.repaint();
+		
+		}else if(ie.getSource()==schemeComboBox){
+		
+			scheme = schemeComboBox.getSelectedItem().toString();
+		
+			if(scheme.equals("Continuous")){
+
+				setCurrentState(type, "Continuous");
+			
+			}else if(scheme.equals("Binned")){
+				
+				setCurrentState(type, "Binned");
+				
+				int numBin = 0;
+				
+				if(type.equals("Abundance")){
+					numBin = ds.getAbundBinData().size();
+				}else if(type.equals("Derivative")){
+					numBin = ds.getDerBinData().size();
+				}else if(type.equals("Reaction Flux")){
+					numBin = ds.getFluxBinData().size();
+				}
+				
+				numBinModel.setValue(new Integer(numBin));
+
+				table.setCurrentState(type, numBinModel.getNumber().intValue());
+			
+			}
+		
+		}
+
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	public void actionPerformed(ActionEvent ae){
+	
+		if(ae.getSource()==defaultButton){
+		
+			if(scheme.equals("Continuous")){
+		
+				minSlider.setValue(0);
+				maxSlider.setValue(1000);
+				
+				x0RSlider.setValue(80);
+				x0GSlider.setValue(60);
+				x0BSlider.setValue(20);
+				aRSlider.setValue(50);
+				aGSlider.setValue(40);
+				aBSlider.setValue(30);
+				
+				colorSchemeComboBoxCont.removeItemListener(this);
+				colorSchemeComboBoxCont.setSelectedItem("Rainbow");
+				colorSchemeComboBoxCont.addItemListener(this);
+			
+			}else if(scheme.equals("Binned")){
+			
+				colorSchemeComboBoxBinned.removeItemListener(this);
+				colorSchemeComboBoxBinned.setSelectedItem("Color Scheme 1");
+				colorSchemeComboBoxBinned.addItemListener(this);
+			
+				if(type.equals("Abundance")){
+				
+					Vector abundColumnData = new Vector();
+					abundColumnData.addElement(new AbundRowData(-5, 0, true, new Color (255,0,0)));
+					abundColumnData.addElement(new AbundRowData(-10, -5, true, new Color(215,0,0)));
+					abundColumnData.addElement(new AbundRowData(-15, -10, true, new Color(175,0,0)));
+					abundColumnData.addElement(new AbundRowData(-20, -15, true, new Color(135,0,0)));
+					abundColumnData.addElement(new AbundRowData(-25, -20, true, new Color(95,0,0)));
+				
+					ds.setAbundBinData(abundColumnData);
+				
+				}else if(type.equals("Derivative")){
+				
+					Vector derColumnData = new Vector();
+					derColumnData.addElement(new DerRowData(-1, 0, true, new Color (255,0,0), new Color(0,255,0)));
+					derColumnData.addElement(new DerRowData(-2, -1, true, new Color(215,0,0), new Color(0,215,0)));
+					derColumnData.addElement(new DerRowData(-3, -2, true, new Color(175,0,0), new Color(0,175,0)));
+					derColumnData.addElement(new DerRowData(-4, -3, true, new Color(135,0,0), new Color(0,135,0)));
+					derColumnData.addElement(new DerRowData(-5, -4, true, new Color(95,0,0), new Color(0,95,0)));
+							
+					ds.setDerBinData(derColumnData);
+				
+				}else if(type.equals("Reaction Flux")){
+				
+					Vector fluxColumnData = new Vector();
+					fluxColumnData.addElement(new FluxRowData(-1, 0, true, new Color (255,0,0), 0, 1));
+					fluxColumnData.addElement(new FluxRowData(-2, -1, true, new Color(215,0,0), 0, 1));
+					fluxColumnData.addElement(new FluxRowData(-3, -2, true, new Color(175,0,0), 0, 1));
+					fluxColumnData.addElement(new FluxRowData(-4, -3, true, new Color(135,0,0), 0, 1));
+					fluxColumnData.addElement(new FluxRowData(-5, -4, true, new Color(95,0,0), 0, 1));
+					
+					ds.setFluxBinData(fluxColumnData);
+				
+				}
+				
+				numBinModel.setValue(new Integer(5));
+				table.setCurrentState(type, 5);
+			
+			}
+			
+		}else if(ae.getSource()==applyButton){
+
+			if(delayDialog==null){
+
+				openDelayDialog(this);
+				
+				final SwingWorker worker = new SwingWorker(){
+			
+					public Object construct(){
+						
+						if(scheme.equals("Continuous")){
+	
+							if(type.equals("Abundance") && goodContInterval()){
+						
+								ds.setAbundScheme("Continuous");
+						
+								double[] tempArray = new double[6];
+			
+								tempArray[0] = elementVizRainbowPanel.x0R;
+								tempArray[1] = elementVizRainbowPanel.x0G;
+								tempArray[2] = elementVizRainbowPanel.x0B;
+								tempArray[3] = elementVizRainbowPanel.aR;
+								tempArray[4] = elementVizRainbowPanel.aG;
+								tempArray[5] = elementVizRainbowPanel.aB;
+							
+								ds.setAbundColorValues(tempArray);						
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.setType(type, scheme);
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.setRGB(tempArray);
+								Cina.elementVizFrame.elementVizAnimatorFrame.abundMin = Float.valueOf(minField.getText()).floatValue();
+								Cina.elementVizFrame.elementVizAnimatorFrame.abundMax = Float.valueOf(maxField.getText()).floatValue();
+								Cina.elementVizFrame.elementVizAnimatorFrame.setMinAbund(Cina.elementVizFrame.elementVizAnimatorFrame.abundMin);
+					    		Cina.elementVizFrame.elementVizAnimatorFrame.setMaxAbund(Cina.elementVizFrame.elementVizAnimatorFrame.abundMax);
+								
+								Cina.elementVizFrame.elementVizAnimatorFrame.type = type;
+								Cina.elementVizFrame.elementVizAnimatorFrame.scheme = scheme;
+								
+								ds.setAbundIncludeValues(includeRadioButton.isSelected());
+								
+								Cina.elementVizFrame.elementVizAnimatorFrame.setChartColors(type, scheme);
+								Cina.elementVizFrame.elementVizAnimatorFrame.setFormatLayout(type, scheme);
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.type = type;
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.scheme = scheme;
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.repaint();
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.repaint();
+				
+							}else if(type.equals("Derivative")){
+							
+								ds.setDerScheme("Continuous");
+							
+								double[] tempArray = new double[6];
+			
+								tempArray[0] = elementVizRainbowPanel.x0R;
+								tempArray[1] = elementVizRainbowPanel.x0G;
+								tempArray[2] = elementVizRainbowPanel.x0B;
+								tempArray[3] = elementVizRainbowPanel.aR;
+								tempArray[4] = elementVizRainbowPanel.aG;
+								tempArray[5] = elementVizRainbowPanel.aB;
+							
+								ds.setDerColorValues(tempArray);
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.setRGB(tempArray);
+								Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMag = Integer.valueOf(derField.getText()).intValue();
+								Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMax = Float.valueOf(maxField.getText()).floatValue();
+								Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMin = -Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMax;
+								Cina.elementVizFrame.elementVizAnimatorFrame.setMaxDerAbund(Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMax);
+								Cina.elementVizFrame.elementVizAnimatorFrame.setMinDerAbund(-Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMax);
+					    			
+								elementVizRainbowPanel.setType(type, scheme);
+								
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.derAbundMag = Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMag;
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.setType(type, scheme);
+								
+								ds.setDerIncludeValues(includeRadioButton.isSelected());
+								
+								Cina.elementVizFrame.elementVizAnimatorFrame.type = type;
+								Cina.elementVizFrame.elementVizAnimatorFrame.scheme = scheme;
+								
+								Cina.elementVizFrame.elementVizAnimatorFrame.setChartColors(type, scheme);
+							
+								Cina.elementVizFrame.elementVizAnimatorFrame.setFormatLayout(type, scheme);
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.type = type;
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.scheme = scheme;
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.repaint();
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.repaint();
+							
+							}else if(type.equals("Reaction Flux") && goodContInterval()){
+						
+								ds.setFluxScheme("Continuous");
+						
+								double[] tempArray = new double[6];
+			
+								tempArray[0] = elementVizRainbowPanel.x0R;
+								tempArray[1] = elementVizRainbowPanel.x0G;
+								tempArray[2] = elementVizRainbowPanel.x0B;
+								tempArray[3] = elementVizRainbowPanel.aR;
+								tempArray[4] = elementVizRainbowPanel.aG;
+								tempArray[5] = elementVizRainbowPanel.aB;
+							
+								ds.setFluxColorValues(tempArray);
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.setType(type, scheme);
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.setRGB(tempArray);
+								Cina.elementVizFrame.elementVizAnimatorFrame.fluxMin = Float.valueOf(minField.getText()).floatValue();
+								Cina.elementVizFrame.elementVizAnimatorFrame.fluxMax = Float.valueOf(maxField.getText()).floatValue();
+								Cina.elementVizFrame.elementVizAnimatorFrame.setMinFlux(Cina.elementVizFrame.elementVizAnimatorFrame.fluxMin);
+					    		Cina.elementVizFrame.elementVizAnimatorFrame.setMaxFlux(Cina.elementVizFrame.elementVizAnimatorFrame.fluxMax);
+								
+								ds.setFluxIncludeValues(includeRadioButton.isSelected());
+								
+								Cina.elementVizFrame.elementVizAnimatorFrame.type = type;
+								Cina.elementVizFrame.elementVizAnimatorFrame.scheme = scheme;
+								
+								Cina.elementVizFrame.elementVizAnimatorFrame.setChartColors(type, scheme);
+	
+								Cina.elementVizFrame.elementVizAnimatorFrame.setFormatLayout(type, scheme);
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.type = type;
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.scheme = scheme;
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.repaint();
+								Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.repaint();
+				
+							}else{
+						
+								closeDelayDialog();
+							
+								String string = "Value minimum must be less than value maximum.";
+								Dialogs.createExceptionDialog(string, Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorColorSettingsFrame);
+							
+							}
+					
+						}else if(scheme.equals("Binned")){
+							
+							if(table.isEditing()){
+							
+								for(int i=0; i<table.getRowCount(); i++){
+			
+									for(int j=0; j<table.getColumnCount(); j++){
+										
+										table.getCellEditor(i, j).stopCellEditing();
+										
+									}
+									
+								}
+							
+							}
+							
+							if(goodBinIntervals(table.tableModel.getDataVector(), type)){
+							
+								if(type.equals("Abundance")){
+									
+									ds.setAbundScheme("Binned");
+									ds.setAbundBinData(table.tableModel.getDataVector());
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.setType(type, scheme);
+									Cina.elementVizFrame.elementVizAnimatorFrame.abundMax = (float)Math.pow(10,((Integer)(table.tableModel.getValueAt(0, 1))).intValue());
+									Cina.elementVizFrame.elementVizAnimatorFrame.abundMin = (float)Math.pow(10,((Integer)((Vector)(table.tableModel.getDataVector().elementAt(table.tableModel.getDataVector().size()-1))).elementAt(0)).intValue());
+									Cina.elementVizFrame.elementVizAnimatorFrame.setMinAbund(Cina.elementVizFrame.elementVizAnimatorFrame.abundMin);
+						    		Cina.elementVizFrame.elementVizAnimatorFrame.setMaxAbund(Cina.elementVizFrame.elementVizAnimatorFrame.abundMax);																											
+									Cina.elementVizFrame.elementVizAnimatorFrame.setChartColors(type, scheme);
+									Cina.elementVizFrame.elementVizAnimatorFrame.type = type;
+									Cina.elementVizFrame.elementVizAnimatorFrame.scheme = scheme;
+									Cina.elementVizFrame.elementVizAnimatorFrame.setFormatLayout(type, scheme);
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.type = type;
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.scheme = scheme;
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.repaint();
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.repaint();
+									
+								}else if(type.equals("Derivative")){
+								
+									ds.setDerScheme("Binned");
+									ds.setDerBinData(table.tableModel.getDataVector());
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.setType(type, scheme);
+									Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMax = (float)Math.pow(10,((Integer)(table.tableModel.getValueAt(0, 1))).intValue());
+									Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMin = -Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMax;
+									Cina.elementVizFrame.elementVizAnimatorFrame.setMinDerAbund(Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMin);
+						    		Cina.elementVizFrame.elementVizAnimatorFrame.setMaxDerAbund(Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMax);							
+									Cina.elementVizFrame.elementVizAnimatorFrame.derAbundMag = ((Integer)((Vector)(table.tableModel.getDataVector().elementAt(table.tableModel.getDataVector().size()-1))).elementAt(0)).intValue();
+									Cina.elementVizFrame.elementVizAnimatorFrame.setChartColors(type, scheme);
+									Cina.elementVizFrame.elementVizAnimatorFrame.type = type;
+									Cina.elementVizFrame.elementVizAnimatorFrame.scheme = scheme;
+									Cina.elementVizFrame.elementVizAnimatorFrame.setFormatLayout(type, scheme);
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.type = type;
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.scheme = scheme;
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.repaint();
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizRainbowPanel.repaint();
+					
+								}else if(type.equals("Reaction Flux")){
+								
+									ds.setFluxScheme("Binned");
+									ds.setFluxBinData(table.tableModel.getDataVector());
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizBinnedFluxPanel.setDataVector(ds.getFluxBinData());
+									Cina.elementVizFrame.elementVizAnimatorFrame.fluxMax = (float)Math.pow(10,((Integer)(table.tableModel.getValueAt(0, 1))).intValue());
+									Cina.elementVizFrame.elementVizAnimatorFrame.fluxMin = (float)Math.pow(10,((Integer)((Vector)(table.tableModel.getDataVector().elementAt(table.tableModel.getDataVector().size()-1))).elementAt(0)).intValue());
+									Cina.elementVizFrame.elementVizAnimatorFrame.setMinFlux(Cina.elementVizFrame.elementVizAnimatorFrame.fluxMin);
+						    		Cina.elementVizFrame.elementVizAnimatorFrame.setMaxFlux(Cina.elementVizFrame.elementVizAnimatorFrame.fluxMax);							
+									Cina.elementVizFrame.elementVizAnimatorFrame.setChartColors(type, scheme);
+									Cina.elementVizFrame.elementVizAnimatorFrame.type = type;
+									Cina.elementVizFrame.elementVizAnimatorFrame.scheme = scheme;
+									Cina.elementVizFrame.elementVizAnimatorFrame.setFormatLayout(type, scheme);
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.type = type;
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.scheme = scheme;
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorPanel.repaint();
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizBinnedFluxPanel.setSize(200, (table.tableModel.getDataVector().size()-1)*15+50);
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizBinnedFluxPanel.validate();
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizBinnedFluxPanel.setPreferredSize(Cina.elementVizFrame.elementVizAnimatorFrame.elementVizBinnedFluxPanel.getSize());
+									Cina.elementVizFrame.elementVizAnimatorFrame.elementVizBinnedFluxPanel.revalidate();
+								
+								}
+							
+							}else{
+							
+								closeDelayDialog();
+							
+								String string = "Bin intervals are not entered correctly. Please choose a maximum greater than the minimum indicated for each bin.";
+								Dialogs.createExceptionDialog(string, Cina.elementVizFrame.elementVizAnimatorFrame.elementVizAnimatorColorSettingsFrame);
+							
+							}
+						
+						}
+										
+						return new Object();
+						
+					}
+					
+					public void finished(){
+						
+						closeDelayDialog();
+							
+					}
+					
+				};
+				
+				worker.start();
+				
+			}
+		
+		}else if(ae.getSource()==helpButton){
+				
+			elementVizAnimatorColorSettingsHelpFrame = new HelpFrame("Help on Animator Color Scale Settings", "ElementVizColorSettings");
+			elementVizAnimatorColorSettingsHelpFrame.setVisible(true);
+			
+		}
+	
+	}
+
+	/**
+	 * Good cont interval.
+	 *
+	 * @return true, if successful
+	 */
+	public boolean goodContInterval(){
+	
+		boolean goodContInterval = true;
+		
+		double min = Double.valueOf(minField.getText()).doubleValue();
+		double max = Double.valueOf(maxField.getText()).doubleValue();
+		
+		if(min>=max){goodContInterval = false;}
+		
+		return goodContInterval;
+	
+	}
+
+	/**
+	 * Good bin intervals.
+	 *
+	 * @param dataVector the data vector
+	 * @param type the type
+	 * @return true, if successful
+	 */
+	public boolean goodBinIntervals(Vector dataVector, String type){
+	
+		boolean goodBinIntervals = true;
+		
+		for(int i=0; i<dataVector.size(); i++){
+			
+			int min = ((Integer)((Vector)dataVector.elementAt(i)).elementAt(0)).intValue();
+			int max = ((Integer)((Vector)dataVector.elementAt(i)).elementAt(1)).intValue();
+		
+			if(max<=min){goodBinIntervals = false;}
+
+		}
+		
+		return goodBinIntervals;
+	
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.swing.event.ChangeListener#stateChanged(javax.swing.event.ChangeEvent)
+	 */
+	public void stateChanged(ChangeEvent ce){
+	
+		if(ce.getSource()==minSlider){
+		
+			double min = 0.0;
+			double max = 0.0;
+			
+			if(type.equals("Abundance")){
+		
+				min = Cina.elementVizFrame.elementVizAnimatorFrame.getAbundMin();
+				max = Cina.elementVizFrame.elementVizAnimatorFrame.getAbundMax();
+
+			}else if(type.equals("Reaction Flux")){
+			
+				min = Cina.elementVizFrame.elementVizAnimatorFrame.getFluxMin();
+				max = Cina.elementVizFrame.elementVizAnimatorFrame.getFluxMax();
+
+				elementVizRainbowPanel.setType(type, scheme);
+				elementVizRainbowPanel.repaint();
+			
+			}
+		
+			minField.setText(NumberFormats.getFormattedValueLong(getDoubleValue(minSlider.getValue(), min, max)));
+
+		}else if(ce.getSource()==maxSlider){
+		
+			double min = 0.0;
+			double max = 0.0;
+		
+			if(type.equals("Abundance")){
+		
+				min = Cina.elementVizFrame.elementVizAnimatorFrame.getAbundMin();
+				max = Cina.elementVizFrame.elementVizAnimatorFrame.getAbundMax();
+
+				maxField.setText(NumberFormats.getFormattedValueLong(getDoubleValue(maxSlider.getValue(), min, max)));
+
+			}else if(type.equals("Derivative")){
+	
+				max = Cina.elementVizFrame.elementVizAnimatorFrame.getDerAbundMax();
+		
+				maxField.setText(NumberFormats.getFormattedValueLong2(getDoubleValue(maxSlider.getValue(), Math.pow(10, -30), max)));
+		
+			}else if(type.equals("Reaction Flux")){
+			
+				min = Cina.elementVizFrame.elementVizAnimatorFrame.getFluxMin();
+				max = Cina.elementVizFrame.elementVizAnimatorFrame.getFluxMax();
+
+				maxField.setText(NumberFormats.getFormattedValueLong(getDoubleValue(maxSlider.getValue(), min, max)));
+
+				elementVizRainbowPanel.setType(type, scheme);
+				elementVizRainbowPanel.repaint();
+			
+			}
+
+		}else if(ce.getSource()==derSlider){
+		
+			derField.setText(String.valueOf(derSlider.getValue()));
+			elementVizRainbowPanel.derAbundMag = derSlider.getValue();
+			elementVizRainbowPanel.repaint();
+		
+		}else if(ce.getSource()==x0RSlider
+					|| ce.getSource()==x0GSlider
+					|| ce.getSource()==x0BSlider
+					|| ce.getSource()==aRSlider
+					|| ce.getSource()==aGSlider
+					|| ce.getSource()==aBSlider){
+		
+			x0RField.setText(String.valueOf(x0RSlider.getValue()/100.0));
+			x0GField.setText(String.valueOf(x0GSlider.getValue()/100.0));
+			x0BField.setText(String.valueOf(x0BSlider.getValue()/100.0));
+			aRField.setText(String.valueOf(aRSlider.getValue()/100.0));
+			aGField.setText(String.valueOf(aGSlider.getValue()/100.0));
+			aBField.setText(String.valueOf(aBSlider.getValue()/100.0));
+			
+			elementVizRainbowPanel.x0R = x0RSlider.getValue()/100.0;
+			elementVizRainbowPanel.x0G = x0GSlider.getValue()/100.0;
+			elementVizRainbowPanel.x0B = x0BSlider.getValue()/100.0;
+			elementVizRainbowPanel.aR = aRSlider.getValue()/100.0;
+			elementVizRainbowPanel.aG = aGSlider.getValue()/100.0;
+			elementVizRainbowPanel.aB = aBSlider.getValue()/100.0;
+			
+			elementVizRainbowPanel.repaint();
+		
+		}else if(ce.getSource()==numBinSpinner){
+
+			table.setCurrentState(type, numBinModel.getNumber().intValue());
+		
+		}
+	
+	}
+
+	 //Window closing listener
+	/* (non-Javadoc)
+ 	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+ 	 */
+ 	public void windowClosing(WindowEvent we) {   
+	
+		if(we.getSource()==this){  
+
+		   setVisible(false);
+		   dispose();
+		   
+    	}
+    	
+    } 
+    
+    //Remainder of windowListener methods
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+     */
+    public void windowActivated(WindowEvent we){}
+    
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+     */
+    public void windowClosed(WindowEvent we){}
+    
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+     */
+    public void windowDeactivated(WindowEvent we){}
+    
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+     */
+    public void windowDeiconified(WindowEvent we){}
+    
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+     */
+    public void windowIconified(WindowEvent we){}
+    
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+     */
+    public void windowOpened(WindowEvent we){}
+
+	/**
+	 * Open delay dialog.
+	 *
+	 * @param frame the frame
+	 */
+	public void openDelayDialog(Frame frame){
+		
+		delayDialog = new JDialog(frame, "Please wait", false);
+    	delayDialog.setSize(340, 200);
+    	delayDialog.getContentPane().setLayout(new GridBagLayout());
+		delayDialog.setLocationRelativeTo(frame);
+		
+		JTextArea delayTextArea = new JTextArea("", 5, 30);
+		delayTextArea.setLineWrap(true);
+		delayTextArea.setWrapStyleWord(true);
+		delayTextArea.setEditable(false);
+		
+		JScrollPane sp = new JScrollPane(delayTextArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		sp.setPreferredSize(new Dimension(300, 100));
+
+		String delayString = "Please be patient while applying new settings. DO NOT operate the Animator Color Scale Settings interface at this time!";
+		
+		delayTextArea.setText(delayString);
+		
+		delayTextArea.setCaretPosition(0);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.anchor = GridBagConstraints.CENTER;
+		
+		delayDialog.getContentPane().add(sp, gbc);
+		
+		//Cina.setFrameColors(delayDialog);	
+		
+		delayDialog.validate();
+		
+		delayDialog.setVisible(true);
+		
+	}
+	
+	/**
+	 * Close delay dialog.
+	 */
+	public void closeDelayDialog(){
+		
+		delayDialog.setVisible(false);
+		delayDialog.dispose();
+		delayDialog=null;
+	
+	}
+
+}
